@@ -1,21 +1,31 @@
 #include "Builder.h"
 
-int main()
+int main (int argc, char** argv)
 {
-    const std::string url("http://date.jsontest.com/");
-    QueryRequest qr;
-    qr.SetUrl (url);
-    qr.Query ();
-    std::string httpData = qr.GetStr ();
+    if (argc != 4)
+    {
+        printf ("usage: symbol limit timeframe\n");
+	return 0;
+    }
+    BinanceInterfacer bint;
+    bint.ping ();
+    std::string symbol (argv[1]);
+    if (!bint.CheckSymbolValidity (symbol)) return 1; 
+    const int size = atoi (argv[2]);
+    double* data = new double[size];
+    memset (data, 0, sizeof (double)*size);
+    int got = bint.QueryData (symbol, data, size, argv[3]);
+    if (!got) return 1;
+    FILE* f = fopen ("data.txt", "w");
+    for (int i = 0; i < got; i++)
+    {
+        fprintf (f, "%d %g\n", i, data[i]);
+    }
+    fclose (f);
     
-    if (!httpData.empty ())
+    /*if (!httpData.empty ())
     {
         printf ("\nGot successful response from %s\n", url.c_str());
-        
-        // Response looks good - done using Curl now.  Try to parse the results
-        // and print them out.
-        //Json::Value jsonData;
-        //Json::Reader jsonReader;
 	Document d;
         ParseResult ok = d.Parse(httpData.c_str());
         if (ok)
@@ -34,7 +44,7 @@ int main()
     else
     {
         return 1;
-    }
+    }*/
     
     return 0;
 }

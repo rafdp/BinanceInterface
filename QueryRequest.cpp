@@ -35,7 +35,7 @@ void QueryRequest::SetUrl (std::string url)
     error = SUCCESS;
 }
 
-void QueryRequest::Query ()
+int QueryRequest::Query (bool tolerate)
 {
     curl_easy_setopt(curl, CURLOPT_URL, currentUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
@@ -47,14 +47,17 @@ void QueryRequest::Query ()
     curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     
-    if (httpCode == 200)
+    if (httpCode == HTTP_OK_CODE || tolerate)
     {
 	error = SUCCESS;
     }
-    else
+    else if (!tolerate)
     {
 	PRINT_ERROR (REQUEST_FAILED);
+	printf ("httpCode = %d\n", httpCode);
     } 
+    if (tolerate) return httpCode;
+    return SUCCESS;
 }
 
 std::string QueryRequest::GetStr ()
@@ -62,4 +65,7 @@ std::string QueryRequest::GetStr ()
     return httpData;
 }
 
-
+int QueryRequest::GetError ()
+{
+    return error;
+}

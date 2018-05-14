@@ -12,8 +12,9 @@ public:
     ~QueryRequest ();
 
     void SetUrl (std::string);
-    void Query ();
+    int Query (bool tolerate = false);
     std::string GetStr ();
+    int GetError ();
 };
 
 

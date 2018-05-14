@@ -1,3 +1,2 @@
 #include "includes.h"
-#include "QueryRequest.h"
-
+#include "BinanceInterfacer.h"
